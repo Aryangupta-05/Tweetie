@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://tweetie-1.onrender.com", "http://localhost:3000"],
+    origin: [process.env.CLIENT_URL, "http://localhost:3000"].filter(Boolean),
     credentials: true,
   })
 );
