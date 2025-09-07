@@ -29,7 +29,6 @@ Tweetie is a fully responsive Single Page Application (SPA)n, fullstack **Twitte
 - **React Query** (`@tanstack/react-query`)
 - **DaisyUI**
 - **Cloudinary (client-side uploads)**
-- **Added SPA routing 
 
 ### Backend:
 - **Node.js + Express.js**
