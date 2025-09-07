@@ -18,16 +18,24 @@ function App() {
 		queryKey: ["authUser"],
 		queryFn: async () => {
 			try {
-				const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/me`, {
+				const base = import.meta.env.VITE_API_URL || "";
+				const res = await fetch(`${base}/api/auth/me`, {
 					credentials: "include",
 				});
-				const data = await res.json();
+				const contentType = res.headers.get("content-type") || "";
+				let data = null;
+				try {
+					if (contentType.includes("application/json")) {
+						data = await res.json();
+					} else {
+						const textBody = await res.text();
+						data = textBody ? JSON.parse(textBody) : null;
+					}
+				} catch {}
 				if (data.error) return null;
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
+				if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
 				console.log("authUser is here:", data);
-				return data;
+				return data ?? null;
 			} catch (error) {
 				throw new Error(error);
 			}

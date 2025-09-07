@@ -3,7 +3,7 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const Posts = ({ feedType, username, userId }) => {
 	const getPostEndpoint = () => {
@@ -34,9 +34,18 @@ const Posts = ({ feedType, username, userId }) => {
 			const res = await fetch(POST_ENDPOINT, {
 				credentials: "include",
 			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || "Something went wrong");
-			return data;
+			const contentType = res.headers.get("content-type") || "";
+			let data = null;
+			try {
+				if (contentType.includes("application/json")) {
+					data = await res.json();
+				} else {
+					const textBody = await res.text();
+					data = textBody ? JSON.parse(textBody) : null;
+				}
+			} catch {}
+			if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
+			return data ?? [];
 		},
 	});
 

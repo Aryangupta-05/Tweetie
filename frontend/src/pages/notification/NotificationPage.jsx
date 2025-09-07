@@ -12,12 +12,22 @@ const NotificationPage = () => {
 		queryKey: ["notifications"],
 		queryFn: async () => {
 			try {
-				const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/notifications`, {
+				const base = import.meta.env.VITE_API_URL || "";
+				const res = await fetch(`${base}/api/notifications`, {
 					credentials: "include",
 				});
-				const data = await res.json();
-				if (!res.ok) throw new Error(data.error || "Something went wrong");
-				return data;
+				const contentType = res.headers.get("content-type") || "";
+				let data = null;
+				try {
+					if (contentType.includes("application/json")) {
+						data = await res.json();
+					} else {
+						const textBody = await res.text();
+						data = textBody ? JSON.parse(textBody) : null;
+					}
+				} catch {}
+				if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
+				return data ?? [];
 			} catch (error) {
 				throw new Error(error);
 			}
@@ -27,13 +37,23 @@ const NotificationPage = () => {
 	const { mutate: deleteNotifications } = useMutation({
 		mutationFn: async () => {
 			try {
-				const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/notifications`, {
+				const base = import.meta.env.VITE_API_URL || "";
+				const res = await fetch(`${base}/api/notifications`, {
 					method: "DELETE",
 					credentials: "include",
 				});
-				const data = await res.json();
-				if (!res.ok) throw new Error(data.error || "Something went wrong");
-				return data;
+				const contentType = res.headers.get("content-type") || "";
+				let data = null;
+				try {
+					if (contentType.includes("application/json")) {
+						data = await res.json();
+					} else {
+						const textBody = await res.text();
+						data = textBody ? JSON.parse(textBody) : null;
+					}
+				} catch {}
+				if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
+				return data ?? {};
 			} catch (error) {
 				throw new Error(error);
 			}

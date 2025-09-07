@@ -11,7 +11,7 @@ import { toast } from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
@@ -28,9 +28,18 @@ const Post = ({ post }) => {
 				method: "DELETE",
 				credentials: "include",
 			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || "Something went wrong");
-			return data;
+			const contentType = res.headers.get("content-type") || "";
+			let data = null;
+			try {
+				if (contentType.includes("application/json")) {
+					data = await res.json();
+				} else {
+					const textBody = await res.text();
+					data = textBody ? JSON.parse(textBody) : null;
+				}
+			} catch {}
+			if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
+			return data ?? {};
 		},
 		onSuccess: () => {
 			toast.success("Post deleted successfully");
@@ -44,9 +53,18 @@ const Post = ({ post }) => {
 				method: "POST",
 				credentials: "include",
 			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || "Something went wrong");
-			return data;
+			const contentType = res.headers.get("content-type") || "";
+			let data = null;
+			try {
+				if (contentType.includes("application/json")) {
+					data = await res.json();
+				} else {
+					const textBody = await res.text();
+					data = textBody ? JSON.parse(textBody) : null;
+				}
+			} catch {}
+			if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
+			return data ?? [];
 		},
 		onSuccess: (updatedLikes) => {
 			queryClient.setQueryData(["posts"], (oldData) =>
@@ -66,9 +84,18 @@ const Post = ({ post }) => {
 				credentials: "include",
 				body: JSON.stringify({ text: comment }),
 			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || "Something went wrong");
-			return data;
+			const contentType = res.headers.get("content-type") || "";
+			let data = null;
+			try {
+				if (contentType.includes("application/json")) {
+					data = await res.json();
+				} else {
+					const textBody = await res.text();
+					data = textBody ? JSON.parse(textBody) : null;
+				}
+			} catch {}
+			if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
+			return data ?? {};
 		},
 		onSuccess: () => {
 			toast.success("Comment posted successfully");

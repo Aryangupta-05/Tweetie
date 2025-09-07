@@ -5,7 +5,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const CreatePost = () => {
 	const [text, setText] = useState("");
@@ -30,11 +30,21 @@ const CreatePost = () => {
 				credentials: "include",
 				body: JSON.stringify({ text, img }),
 			});
-			const data = await res.json();
+			// Safe parse
+			const contentType = res.headers.get("content-type") || "";
+			let data = null;
+			try {
+				if (contentType.includes("application/json")) {
+					data = await res.json();
+				} else {
+					const textBody = await res.text();
+					data = textBody ? JSON.parse(textBody) : null;
+				}
+			} catch {}
 			if (!res.ok) {
-				throw new Error(data.error || "Something went wrong");
+				throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
 			}
-			return data;
+			return data ?? {};
 		},
 		onSuccess: () => {
 			setText("");
