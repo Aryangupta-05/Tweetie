@@ -9,6 +9,6 @@ export const generateTokenAndSetCookie = (userId, res) => {
 		maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
 		httpOnly: true,                   // Prevents JS access (XSS protection)
 		secure: true,                     // Cookie sent only over HTTPS
-		sameSite: "None",                 // Allows cross-site requests 
+		sameSite: "none",                 // Allows cross-site requests 
 	});
 };
