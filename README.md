@@ -1,7 +1,9 @@
 # Tweetie — A Fullstack Social Media WebSite
 
+[![Live Website](https://img.shields.io/badge/Live%20Frontend-%F0%9F%9A%80-blue?style=for-the-badge)](https://tweetie-1.onrender.com)
 
-Tweetie is a fully responsive Single Page Application (SPA)n, fullstack **Twitter clone** built with the MERN stack, featuring user authentication, post creation, likes, following, and real-time user profile management.
+Tweetie is a fully responsive, fullstack **Twitter clone** built with the MERN stack, featuring user authentication, post creation, likes, following, and real-time user profile management.
+
 ---
 
 ## ✨ Features
@@ -38,3 +40,5 @@ Tweetie is a fully responsive Single Page Application (SPA)n, fullstack **Twitte
 - **Environment-based deployment configs**
 
 ---
+
+
