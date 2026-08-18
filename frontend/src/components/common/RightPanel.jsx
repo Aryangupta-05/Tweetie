@@ -6,7 +6,7 @@ import useFollow from "../../hooks/useFollow";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
 import LoadingSpinner from "./LoadingSpinner";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const RightPanel = () => {
 	const { data: suggestedUsers, isLoading } = useQuery({

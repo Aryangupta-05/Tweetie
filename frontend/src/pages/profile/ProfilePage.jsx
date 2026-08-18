@@ -40,9 +40,8 @@ const ProfilePage = () => {
     queryKey: ["userProfile", username],
     queryFn: async () => {
       try {
-        const url = `${
-          import.meta.env.VITE_API_URL
-        }/api/users/profile/${username}`;
+        const baseUrl = import.meta.env.VITE_API_URL || "";
+        const url = `${baseUrl}/api/users/profile/${username}`;
         console.log("Fetching user profile:", url);
 
         const res = await fetch(url, {
