@@ -153,6 +153,27 @@ export const getAllPosts = async (req, res) => {
 	}
 };
 
+/**
+ * FOR YOU FEED — Ranked by trendingScore (pre-calculated by the background Cron job)
+ * Formula: ((Likes × 1) + (Comments × 5)) / (AgeInHours + 2)^1.5
+ * This route is O(1) fast — no math here, just read the pre-saved score!
+ */
+export const getForYouPosts = async (req, res) => {
+	try {
+		const posts = await Post.find()
+			.sort({ trendingScore: -1 }) // Highest score first
+			.limit(20) // Top 20 trending posts
+			.populate({ path: "user", select: "-password" })
+			.populate({ path: "comments.user", select: "-password" });
+
+		if (posts.length === 0) return res.status(200).json([]);
+		res.status(200).json(posts);
+	} catch (error) {
+		console.log("Error in getForYouPosts controller: ", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
 export const getLikedPosts = async (req, res) => {
 	const userId = req.params.id;
 
