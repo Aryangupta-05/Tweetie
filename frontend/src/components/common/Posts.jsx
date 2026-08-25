@@ -9,7 +9,7 @@ const Posts = ({ feedType, username, userId }) => {
 	const getPostEndpoint = () => {
 		switch (feedType) {
 			case "forYou":
-				return `${BASE_URL}/api/posts/all`;
+				return `${BASE_URL}/api/posts/foryou`;
 			case "following":
 				return `${BASE_URL}/api/posts/following`;
 			case "posts":
@@ -29,7 +29,7 @@ const Posts = ({ feedType, username, userId }) => {
 		refetch,
 		isRefetching,
 	} = useQuery({
-		queryKey: ["posts"],
+		queryKey: ["posts", feedType, username],
 		queryFn: async () => {
 			const res = await fetch(POST_ENDPOINT, {
 				credentials: "include",
