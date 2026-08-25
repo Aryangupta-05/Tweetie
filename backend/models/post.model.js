@@ -32,6 +32,10 @@ const postSchema = new mongoose.Schema(
 				},
 			},
 		],
+		trendingScore: {
+			type: Number,
+			default: 0,
+		},
 	},
 	{ timestamps: true }
 );
