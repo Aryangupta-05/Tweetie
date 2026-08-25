@@ -66,10 +66,9 @@ const Post = ({ post }) => {
 			if (!res.ok) throw new Error((data && (data.error || data.message)) || `Request failed (${res.status})`);
 			return data ?? [];
 		},
-		onSuccess: (updatedLikes) => {
-			queryClient.setQueryData(["posts"], (oldData) =>
-				oldData.map((p) => (p._id === post._id ? { ...p, likes: updatedLikes } : p))
-			);
+		onSuccess: () => {
+			// Invalidate all posts queries (covers forYou, following, profile tabs)
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
 		onError: (error) => {
 			toast.error(error.message);
