@@ -36,3 +36,27 @@ frontend/.env
 *.sw?
 
 .env
+backend/.verification/
+backend/.seed/
+
+# Local design concepts and temporary sharing tools
+frontend/src/demo/
+frontend/src/studio/
+frontend/share-preview/
+
+# Local sample data, generated illustrations and manual verification tools
+backend/seeds/
+backend/scripts/seed-community.mjs
+backend/scripts/build-community-images.mjs
+backend/scripts/verify-local.mjs
+backend/scripts/verify-writer.mjs
+
+# Local implementation notes and working reports
+LOCAL-IMPLEMENTATION.md
+LOCAL-VERIFICATION.md
+SAMPLE-COMMUNITY.md
+UI-DEMO.md
+UI-DESIGN-STEPS.md
+AWS_IMPLEMENTATION_AND_ARCHITECTURE_GUIDE.txt
+INTERVIEW_SUMMARY.txt
+PROJECT_SUMMARY.txt
