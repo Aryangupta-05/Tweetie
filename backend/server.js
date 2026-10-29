@@ -8,6 +8,7 @@ import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./routes/notification.route.js";
+import experienceRoutes from "./routes/experience.route.js";
 
 import connectMongoDB from "./db/connectMongoDB.js";
 import startRankerJob from "./scripts/ranker.js";
@@ -28,7 +29,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:3000"].filter(Boolean),
+    origin: [process.env.CLIENT_URL, "http://localhost:3000", "http://127.0.0.1:3000"].filter(Boolean),
     credentials: true,
   })
 );
@@ -37,7 +38,7 @@ app.get("/", (req, res) => {
   res.send("API is working 🚀");
 });
 
-app.use(express.json({ limit: "5mb" })); // to parse req.body
+app.use(express.json({ limit: "6mb" })); // accommodates a 4 MB image encoded as base64
 // limit shouldn't be too high to prevent DOS
 app.use(express.urlencoded({ extended: true })); // to parse form data(urlencoded)
 
@@ -47,6 +48,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api", experienceRoutes);
 
 // Async startup: ensures MongoDB is connected BEFORE ranker runs
 const startServer = async () => {
