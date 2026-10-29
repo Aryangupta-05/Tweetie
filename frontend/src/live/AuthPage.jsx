@@ -1,0 +1,18 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FiArrowRight, FiCode, FiEye, FiEyeOff } from "react-icons/fi";
+import { Brand, Showcase } from "./shared";
+import { request } from "./api";
+import CreatorLinks from "./CreatorLinks";
+
+export default function AuthPage({ signup = false }) {
+  const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
+  const client = useQueryClient();
+  const auth = useMutation({ mutationFn: async body => { await request(`/auth/${signup ? "signup" : "login"}`, { method: "POST", body }); return request("/auth/me"); }, onSuccess: async user => { await client.cancelQueries(); client.clear(); client.setQueryData(["authUser"], user); navigate("/", { replace: true }); } });
+  return <div className="td-auth"><div className="td-auth-story"><Brand /><span className="td-eyebrow">YOUR NEXT CONVERSATION STARTS HERE</span><h1>A little thought.<br />A new connection.<br /><em>A world of possibility.</em></h1><p>Share what you’re building. Learn something new.<br />Find the people who get it.</p><Showcase /><div className="td-auth-bottom"><FiCode /> Built for ideas. Made for people.</div></div><main id="td-main" tabIndex={-1} className="td-auth-form-wrap"><div className="td-auth-mobile-brand"><Brand /></div><div className="td-auth-form"><span className="td-small-label">TWEETIE / {signup ? "GET STARTED" : "WELCOME BACK"}</span><h2>{signup ? "Find your people." : "Good to see you."}</h2><p>{signup ? "Your ideas deserve a conversation." : "Pick up where the conversation left off."}</p><form onSubmit={event => { event.preventDefault(); if (!auth.isPending) auth.mutate(Object.fromEntries(new FormData(event.currentTarget))); }}>
+    {signup && <label htmlFor="auth-fullName">Full name<input id="auth-fullName" name="fullName" autoComplete="name" placeholder="Your full name" required maxLength={60} disabled={auth.isPending} /></label>}
+    {signup && <label htmlFor="auth-email">Email address<input id="auth-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" maxLength={254} required disabled={auth.isPending} /></label>}
+    <label htmlFor="auth-username">Username<input id="auth-username" name="username" autoComplete="username" placeholder="Your username" pattern={signup ? "[A-Za-z0-9_]+" : undefined} title="Letters, numbers, and underscores only" required maxLength={30} disabled={auth.isPending} /></label><div className="td-auth-password-field"><label htmlFor="auth-password">Password</label><span className="td-password-input"><input id="auth-password" name="password" type={visible ? "text" : "password"} autoComplete={signup ? "new-password" : "current-password"} placeholder={signup ? "At least 6 characters" : "Your password"} required minLength={signup ? 6 : undefined} maxLength={128} disabled={auth.isPending} /><button type="button" onClick={() => setVisible(!visible)} aria-label={visible ? "Hide password" : "Show password"}>{visible ? <FiEyeOff /> : <FiEye />}</button></span></div>{auth.isError && <p className="td-form-error" role="alert">{auth.error.message}</p>}<button className="td-button td-button-primary" disabled={auth.isPending}>{auth.isPending ? "Please wait…" : signup ? "Create account" : "Sign in"}<FiArrowRight /></button></form><p className="td-auth-switch">{signup ? "Already part of the conversation?" : "New around here?"} <Link to={signup ? "/login" : "/signup"}>{signup ? "Sign in" : "Join Tweetie"}</Link></p></div><CreatorLinks className="td-auth-credit" /><span className="td-auth-copyright">A little more connected. © 2026 Tweetie</span></main></div>;
+}
