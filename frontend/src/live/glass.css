@@ -1,0 +1,193 @@
+/* Glass styling for the authenticated Tweetie application. */
+.tweetie-app {
+  --td-line: rgba(150, 172, 225, 0.14);
+  --td-glass-line: rgba(169, 190, 244, 0.19);
+  --td-glass-panel: rgba(23, 32, 52, 0.67);
+  --td-glass-shadow: inset 0 1px 0 rgba(226, 235, 255, 0.055), 0 14px 38px rgba(2, 6, 17, 0.2);
+  background-color: #0b101c;
+  background-image:
+    radial-gradient(ellipse 780px 640px at 3% 12%, rgba(77, 103, 228, 0.17), transparent 72%),
+    radial-gradient(ellipse 740px 660px at 98% 25%, rgba(103, 89, 206, 0.13), transparent 72%),
+    radial-gradient(ellipse 900px 600px at 55% 100%, rgba(49, 104, 151, 0.075), transparent 75%);
+  background-attachment: fixed;
+}
+
+.tweetie-app .td-sidebar {
+  background: linear-gradient(180deg, rgba(19, 28, 47, 0.47), rgba(13, 19, 33, 0.25));
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+  backdrop-filter: blur(18px) saturate(115%);
+}
+
+.tweetie-app .td-main {
+  background: rgba(10, 16, 28, 0.48);
+}
+
+.tweetie-app .td-nav-link.is-active {
+  background: linear-gradient(110deg, rgba(117, 139, 255, 0.19), rgba(87, 112, 226, 0.07));
+  box-shadow: inset 0 0 0 1px rgba(164, 183, 255, 0.12), inset 0 1px 0 rgba(224, 232, 255, 0.035);
+}
+
+.tweetie-app .td-nav-link:hover {
+  background-color: rgba(133, 158, 231, 0.075);
+}
+
+.tweetie-app .td-brand-mark {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 20px rgba(95, 122, 255, 0.22);
+}
+
+.tweetie-app .td-welcome {
+  background: linear-gradient(115deg, rgba(84, 101, 164, 0.32), rgba(42, 53, 92, 0.34));
+  border-color: rgba(157, 177, 246, 0.28);
+  box-shadow: var(--td-glass-shadow);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
+}
+
+.tweetie-app .td-composer {
+  background: linear-gradient(130deg, rgba(30, 41, 66, 0.61), rgba(18, 27, 46, 0.52));
+  box-shadow: inset 0 1px 0 rgba(202, 217, 255, 0.035);
+}
+
+.tweetie-app .td-post {
+  background: rgba(15, 23, 40, 0.28);
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.tweetie-app .td-post:hover {
+  background: rgba(39, 53, 85, 0.33);
+  border-bottom-color: rgba(160, 183, 246, 0.23);
+}
+
+.tweetie-app .td-discovery-card,
+.tweetie-app .td-build-card {
+  background: linear-gradient(130deg, rgba(35, 47, 73, 0.65), rgba(19, 28, 47, 0.67));
+  border-color: var(--td-glass-line);
+  box-shadow: var(--td-glass-shadow);
+  -webkit-backdrop-filter: blur(20px) saturate(125%);
+  backdrop-filter: blur(20px) saturate(125%);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tweetie-app .td-discovery-card:hover,
+  .tweetie-app .td-build-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(168, 190, 255, 0.35);
+    box-shadow: inset 0 1px 0 rgba(226, 235, 255, 0.08), 0 18px 42px rgba(2, 6, 17, 0.27);
+  }
+}
+
+.tweetie-app .td-search {
+  background: rgba(24, 35, 58, 0.66);
+  border-color: var(--td-glass-line);
+  box-shadow: inset 0 1px 0 rgba(226, 235, 255, 0.035);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.tweetie-app .td-search:focus-within {
+  border-color: rgba(161, 182, 255, 0.58);
+  box-shadow: 0 0 0 3px rgba(113, 140, 255, 0.09);
+}
+
+.tweetie-app .td-button-primary,
+.tweetie-app .td-mobile-compose {
+  background: linear-gradient(135deg, #7c8dff, #6177ee);
+  box-shadow: inset 0 1px 0 rgba(238, 242, 255, 0.24), 0 5px 21px rgba(81, 107, 231, 0.2);
+}
+
+.tweetie-app .td-button-primary:hover:not(:disabled),
+.tweetie-app .td-mobile-compose:hover {
+  background: linear-gradient(135deg, #8d9dff, #7187fa);
+  box-shadow: inset 0 1px 0 rgba(238, 242, 255, 0.32), 0 7px 26px rgba(99, 125, 255, 0.27);
+}
+
+.tweetie-app .td-button-outline,
+.tweetie-app .td-follow-button {
+  background-color: rgba(37, 51, 82, 0.63);
+  box-shadow: inset 0 1px 0 rgba(225, 234, 255, 0.045);
+}
+
+.tweetie-app .td-avatar {
+  box-shadow: inset 0 1px 0 rgba(241, 245, 255, 0.11);
+}
+
+.tweetie-app .td-section-label {
+  background: rgba(23, 34, 56, 0.59);
+}
+
+.tweetie-app .td-modal,
+.tweetie-app .td-post-menu {
+  background: rgba(19, 29, 49, 0.95);
+  border-color: rgba(161, 184, 245, 0.29);
+  box-shadow: inset 0 1px 0 rgba(235, 241, 255, 0.065), 0 25px 100px rgba(0, 4, 15, 0.55);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  backdrop-filter: blur(22px) saturate(125%);
+}
+
+.tweetie-app .td-modal::backdrop {
+  background: rgba(4, 9, 20, 0.76);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.tweetie-app .td-auth-story {
+  background: radial-gradient(ellipse at 22% 38%, rgba(81, 109, 189, 0.19), transparent 70%), rgba(20, 30, 50, 0.48);
+}
+
+.tweetie-app .td-auth-form-wrap {
+  background: rgba(10, 16, 29, 0.31);
+}
+
+.tweetie-app .td-auth-form input {
+  background: rgba(27, 41, 68, 0.57);
+  border-color: var(--td-glass-line);
+  box-shadow: inset 0 1px 0 rgba(234, 240, 255, 0.035);
+}
+
+.tweetie-app .td-mobile-nav {
+  background: rgba(18, 28, 48, 0.87);
+  border-top-color: rgba(159, 182, 240, 0.24);
+  box-shadow: inset 0 1px 0 rgba(231, 238, 255, 0.04), 0 -8px 30px rgba(2, 6, 17, 0.16);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  backdrop-filter: blur(16px) saturate(125%);
+}
+
+@media (max-width: 650px) {
+  .tweetie-app {
+    background-attachment: scroll;
+    background-image: radial-gradient(ellipse 550px 700px at 0 0, rgba(82, 108, 230, 0.17), transparent 78%);
+  }
+  .tweetie-app .td-welcome {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Keep panels legible where blur is unsupported or transparency is reduced. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tweetie-app .td-discovery-card,
+  .tweetie-app .td-build-card,
+  .tweetie-app .td-modal,
+  .tweetie-app .td-mobile-nav {
+    background: #172237;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .tweetie-app .td-sidebar,
+  .tweetie-app .td-discovery-card,
+  .tweetie-app .td-build-card,
+  .tweetie-app .td-modal,
+  .tweetie-app .td-mobile-nav {
+    background: #172237;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tweetie-app .td-discovery-card:hover,
+  .tweetie-app .td-build-card:hover {
+    transform: none;
+  }
+}
