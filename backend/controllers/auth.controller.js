@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 export const signup = async (req, res) => {
 	try {
 		const { fullName, username, email, password } = req.body;
+		if (typeof fullName !== "string" || !fullName.trim() || fullName.length > 60 || typeof username !== "string" || !/^[A-Za-z0-9_]{1,30}$/.test(username) || typeof email !== "string" || typeof password !== "string" || password.length > 128) return res.status(400).json({ error: "Enter a name, valid username, email and password." });
 
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
@@ -61,6 +62,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
 	try {
 		const { username, password } = req.body;
+		if (typeof username !== "string" || typeof password !== "string" || !username || !password || password.length > 128) return res.status(400).json({ error: "Enter your username and password." });
 		const user = await User.findOne({ username });
 		const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
 

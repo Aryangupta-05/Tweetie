@@ -1,24 +1,25 @@
 import Notification from "../models/notification.model.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
-import { v2 as cloudinary } from "cloudinary";
+import { uploadMedia, deleteMedia } from "../lib/mediaUpload.js";
 
 export const createPost = async (req, res) => {
 	try {
 		const { text } = req.body;
 		let { img } = req.body;
 		const userId = req.user._id.toString();
+		if (text !== undefined && (typeof text !== "string" || text.length > 500)) return res.status(400).json({ error: "Posts can contain up to 500 characters." });
+		if (img && (typeof img !== "string" || !/^data:image\/(png|jpeg|webp|gif);base64,/.test(img) || Buffer.byteLength(img.split(",")[1] || "", "base64") > 4 * 1024 * 1024)) return res.status(400).json({ error: "Choose a PNG, JPEG, WebP or GIF image up to 4 MB." });
 
 		const user = await User.findById(userId);
 		if (!user) return res.status(404).json({ message: "User not found" });
 
-		if (!text && !img) {
+		if (!text?.trim() && !img) {
 			return res.status(400).json({ error: "Post must have text or image" });
 		}
 
 		if (img) {
-			const uploadedResponse = await cloudinary.uploader.upload(img);
-			img = uploadedResponse.secure_url;
+			img = await uploadMedia(img, "posts");
 		}
 
 		const newPost = new Post({
@@ -43,15 +44,15 @@ export const deletePost = async (req, res) => {
 		}
 
 		if (post.user.toString() !== req.user._id.toString()) {
-			return res.status(401).json({ error: "You are not authorized to delete this post" });
+			return res.status(403).json({ error: "You are not authorized to delete this post" });
 		}
 
 		if (post.img) {
-			const imgId = post.img.split("/").pop().split(".")[0];
-			await cloudinary.uploader.destroy(imgId);
+			await deleteMedia(post.img);
 		}
 
 		await Post.findByIdAndDelete(req.params.id);
+		await User.updateMany({ $or: [{ bookmarks: post._id }, { likedPosts: post._id }] }, { $pull: { bookmarks: post._id, likedPosts: post._id } });
 
 		res.status(200).json({ message: "Post deleted successfully" });
 	} catch (error) {
@@ -66,7 +67,7 @@ export const commentOnPost = async (req, res) => {
 		const postId = req.params.id;
 		const userId = req.user._id;
 
-		if (!text) {
+		if (typeof text !== "string" || !text.trim() || text.length > 500) {
 			return res.status(400).json({ error: "Text field is required" });
 		}
 		const post = await Post.findById(postId);
@@ -135,11 +136,11 @@ export const getAllPosts = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate({
 				path: "user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			})
 			.populate({
 				path: "comments.user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			});
 
 		if (posts.length === 0) {
@@ -163,8 +164,8 @@ export const getForYouPosts = async (req, res) => {
 		const posts = await Post.find()
 			.sort({ trendingScore: -1 }) // Highest score first
 			.limit(20) // Top 20 trending posts
-			.populate({ path: "user", select: "-password" })
-			.populate({ path: "comments.user", select: "-password" });
+			.populate({ path: "user", select: "username fullName profileImg coverImg bio link followers following createdAt" })
+			.populate({ path: "comments.user", select: "username fullName profileImg coverImg bio link followers following createdAt" });
 
 		if (posts.length === 0) return res.status(200).json([]);
 		res.status(200).json(posts);
@@ -184,11 +185,11 @@ export const getLikedPosts = async (req, res) => {
 		const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
 			.populate({
 				path: "user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			})
 			.populate({
 				path: "comments.user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			});
 
 		res.status(200).json(likedPosts);
@@ -210,11 +211,11 @@ export const getFollowingPosts = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate({
 				path: "user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			})
 			.populate({
 				path: "comments.user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			});
 
 		res.status(200).json(feedPosts);
@@ -235,11 +236,11 @@ export const getUserPosts = async (req, res) => {
 			.sort({ createdAt: -1 })
 			.populate({
 				path: "user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			})
 			.populate({
 				path: "comments.user",
-				select: "-password",
+				select: "username fullName profileImg coverImg bio link followers following createdAt",
 			});
 
 		res.status(200).json(posts);

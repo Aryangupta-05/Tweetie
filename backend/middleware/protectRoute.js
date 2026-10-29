@@ -24,6 +24,7 @@ export const protectRoute = async (req, res, next) => {
 		next();
 	} catch (err) {
 		console.log("Error in protectRoute middleware", err.message);
+		if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") return res.status(401).json({ error: "Your session has expired. Please sign in again." });
 		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };

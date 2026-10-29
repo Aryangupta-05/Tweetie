@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { v2 as cloudinary } from "cloudinary";
+import { uploadMedia, deleteMedia } from "../lib/mediaUpload.js";
 
 // models
 import Notification from "../models/notification.model.js";
@@ -10,7 +10,7 @@ export const getUserProfile = async (req, res) => {
 		const { username } = req.params;
 		console.log("Requested profile for:", username);
 
-		const user = await User.findOne({ username }).select("-password");
+		const user = await User.findOne({ username }).select("-password -email -bookmarks -likedPosts");
 		
 		if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -75,10 +75,11 @@ export const getSuggestedUsers = async (req, res) => {
 				},
 			},
 			{ $sample: { size: 10 } },
+			{ $project: { password: 0, email: 0, bookmarks: 0, likedPosts: 0 } },
 		]);
 
 		// 1,2,3,4,5,6,
-		const filteredUsers = users.filter((user) => !usersFollowedByMe.following.includes(user._id));
+		const filteredUsers = users.filter((user) => !usersFollowedByMe.following.some(id => String(id) === String(user._id)));
 		const suggestedUsers = filteredUsers.slice(0, 4);
 
 		suggestedUsers.forEach((user) => (user.password = null));
@@ -99,6 +100,13 @@ export const updateUser = async (req, res) => {
 	try {
 		let user = await User.findById(userId);
 		if (!user) return res.status(404).json({ message: "User not found" });
+		if (username !== undefined && (typeof username !== "string" || !/^[A-Za-z0-9_]{1,30}$/.test(username))) return res.status(400).json({ error: "Use up to 30 letters, numbers or underscores for your username." });
+		if (fullName !== undefined && (typeof fullName !== "string" || !fullName.trim() || fullName.length > 60)) return res.status(400).json({ error: "Enter a name up to 60 characters." });
+		if (bio !== undefined && (typeof bio !== "string" || bio.length > 180)) return res.status(400).json({ error: "Keep your bio within 180 characters." });
+		if (email !== undefined && (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) return res.status(400).json({ error: "Enter a valid email address." });
+		if (link && (typeof link !== "string" || !/^https?:\/\/\S+$/i.test(link))) return res.status(400).json({ error: "Use a website beginning with https:// or http://." });
+		const oldProfile = user.profileImg;
+		const oldCover = user.coverImg;
 
 		if ((!newPassword && currentPassword) || (!currentPassword && newPassword)) {
 			return res.status(400).json({ error: "Please provide both current password and new password" });
@@ -116,33 +124,24 @@ export const updateUser = async (req, res) => {
 		}
 
 		if (profileImg) {
-			if (user.profileImg) {
-				// https://res.cloudinary.com/dyfqon1v6/image/upload/v1712997552/zmxorcxexpdbh8r0bkjb.png
-				await cloudinary.uploader.destroy(user.profileImg.split("/").pop().split(".")[0]);
-			}
-
-			const uploadedResponse = await cloudinary.uploader.upload(profileImg);
-			profileImg = uploadedResponse.secure_url;
+			profileImg = await uploadMedia(profileImg, "profiles");
 		}
 
 		if (coverImg) {
-			if (user.coverImg) {
-				await cloudinary.uploader.destroy(user.coverImg.split("/").pop().split(".")[0]);
-			}
-
-			const uploadedResponse = await cloudinary.uploader.upload(coverImg);
-			coverImg = uploadedResponse.secure_url;
+			coverImg = await uploadMedia(coverImg, "covers");
 		}
 
 		user.fullName = fullName || user.fullName;
 		user.email = email || user.email;
 		user.username = username || user.username;
-		user.bio = bio || user.bio;
-		user.link = link || user.link;
+		user.bio = bio !== undefined ? bio.trim() : user.bio;
+		user.link = link !== undefined ? link.trim() : user.link;
 		user.profileImg = profileImg || user.profileImg;
 		user.coverImg = coverImg || user.coverImg;
 
 		user = await user.save();
+		if (profileImg && oldProfile && oldProfile !== profileImg) await deleteMedia(oldProfile);
+		if (coverImg && oldCover && oldCover !== coverImg) await deleteMedia(oldCover);
 
 		// password should be null in response
 		user.password = null;
@@ -150,6 +149,6 @@ export const updateUser = async (req, res) => {
 		return res.status(200).json(user);
 	} catch (error) {
 		console.log("Error in updateUser: ", error.message);
-		res.status(500).json({ error: error.message });
+		res.status(error.code === 11000 ? 409 : 500).json({ error: error.code === 11000 ? "That username or email is already in use." : "Could not update your profile. Please try again." });
 	}
 };
